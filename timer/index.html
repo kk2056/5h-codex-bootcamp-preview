@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#eee9df">
+  <title>5H CODEX BOOTCAMP</title>
+  <style>
+    :root {
+      --paper: #eee9df;
+      --card: #fbf9f3;
+      --ink: #172923;
+      --muted: #69736b;
+      --line: #d7d1c5;
+      --rust: #c95132;
+      --rust-soft: #f3ded5;
+      --moss: #50695a;
+      --night: #1b302a;
+      --night-2: #263c35;
+      --pale: #e4ddce;
+      --yellow: #e6b94f;
+      --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      --shadow: 0 18px 50px rgba(37, 45, 36, .08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: var(--sans);
+      background-color: var(--paper);
+      background-image: radial-gradient(rgba(60, 69, 56, .08) .6px, transparent .6px);
+      background-size: 8px 8px;
+    }
+    button { font: inherit; }
+    .shell { width: min(1180px, calc(100% - 48px)); margin: 0 auto; padding: 25px 0 38px; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 42px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark { width: 42px; height: 42px; display: grid; place-items: center; background: var(--rust); color: #fff8ef; font: 700 13px var(--mono); letter-spacing: -.08em; transform: rotate(-3deg); }
+    .brand-name { font: 700 12px var(--sans); letter-spacing: .16em; text-transform: uppercase; }
+    .brand-sub { margin-top: 3px; font-size: 11px; letter-spacing: .08em; color: var(--muted); }
+    .local-chip { border: 1px solid #c9c3b7; border-radius: 999px; padding: 8px 12px; color: #46574c; font-size: 11px; letter-spacing: .04em; background: rgba(251, 249, 243, .62); }
+    .local-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #77906d; margin-right: 7px; }
+    .eyebrow { display: flex; align-items: center; gap: 10px; color: var(--rust); font: 700 10px var(--mono); letter-spacing: .15em; text-transform: uppercase; }
+    .eyebrow::before { content: ""; width: 24px; height: 1px; background: var(--rust); }
+    h1 { margin: 14px 0 12px; max-width: 740px; font: 500 clamp(36px, 4.7vw, 58px)/1.08 var(--serif); letter-spacing: -.045em; }
+    .intro { margin: 0; max-width: 660px; color: #647066; font-size: 14px; line-height: 1.8; }
+    .hero-grid { display: grid; grid-template-columns: minmax(0, 1.42fr) minmax(290px, .78fr); gap: 18px; margin-top: 31px; }
+    .timer-panel { min-height: 314px; border-radius: 9px; color: #f6f1e5; background: var(--night); padding: 25px 28px 22px; position: relative; overflow: hidden; box-shadow: var(--shadow); }
+    .timer-panel::after { content: ""; position: absolute; width: 290px; height: 290px; border: 1px solid rgba(238, 233, 223, .11); border-radius: 50%; right: -87px; bottom: -181px; box-shadow: 0 0 0 23px rgba(238,233,223,.025), 0 0 0 47px rgba(238,233,223,.02); pointer-events: none; }
+    .timer-head { display: flex; justify-content: space-between; align-items: flex-start; position: relative; z-index: 1; }
+    .timer-label { font-size: 12px; color: #c5c9bc; letter-spacing: .06em; }
+    .status-tag { border: 1px solid rgba(241, 235, 221, .25); border-radius: 2px; padding: 6px 9px; color: #e5c886; font: 11px var(--mono); letter-spacing: .04em; }
+    .status-tag.running { color: #9ed3a3; border-color: rgba(158,211,163,.45); }
+    .status-tag.expired { color: #f4aa8f; border-color: rgba(244,170,143,.55); }
+    .time-row { display: flex; align-items: flex-end; gap: 14px; margin: 28px 0 13px; position: relative; z-index: 1; }
+    .time { font: 500 clamp(58px, 8vw, 88px)/.92 var(--mono); letter-spacing: -.095em; font-variant-numeric: tabular-nums; }
+    .time-unit { padding: 0 0 6px 5px; color: #aeb7aa; font: 10px var(--mono); letter-spacing: .1em; }
+    .timer-caption { position: relative; z-index: 1; margin: 0; color: #c2c8bb; font-size: 12px; }
+    .clock-track { position: relative; z-index: 1; display: flex; gap: 4px; margin: 24px 0 21px; height: 7px; }
+    .clock-segment { position: relative; flex: 1; border-radius: 1px; background: rgba(243, 239, 225, .18); overflow: hidden; }
+    .clock-segment > span { display: block; height: 100%; width: 0; background: var(--yellow); transition: width .3s linear; }
+    .clock-segment:first-child { border-radius: 2px 0 0 2px; }
+    .clock-segment:last-child { border-radius: 0 2px 2px 0; }
+    .timer-meta { position: relative; z-index: 1; display: flex; justify-content: space-between; color: #aeb8ab; font: 10px var(--mono); letter-spacing: .05em; }
+    .timer-controls { display: flex; align-items: center; gap: 9px; margin-top: 24px; position: relative; z-index: 1; }
+    .primary-button { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-width: 158px; border: 0; border-radius: 4px; padding: 12px 17px; background: var(--rust); color: white; font-weight: 700; font-size: 12px; cursor: pointer; transition: background .2s, transform .2s; }
+    .primary-button:hover { background: #b9472d; transform: translateY(-1px); }
+    .primary-button:focus-visible, .quiet-button:focus-visible { outline: 3px solid #e9bd56; outline-offset: 3px; }
+    .primary-button:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+    .button-symbol { font-size: 13px; line-height: 1; }
+    .quiet-button { border: 1px solid rgba(246,241,229,.24); border-radius: 4px; padding: 11px 13px; color: #d7d7cb; background: transparent; font-size: 11px; cursor: pointer; }
+    .quiet-button:hover { background: rgba(255,255,255,.07); }
+    .save-note { margin-left: auto; color: #aeb8ab; font-size: 10px; position: relative; z-index: 1; }
+    .lesson-panel { border: 1px solid var(--line); background: var(--card); border-radius: 9px; padding: 23px 23px 20px; box-shadow: var(--shadow); display: flex; flex-direction: column; }
+    .lesson-head { display: flex; justify-content: space-between; align-items: center; }
+    .lesson-label { color: var(--muted); font: 10px var(--mono); letter-spacing: .13em; text-transform: uppercase; }
+    .lesson-index { color: var(--rust); font: 11px var(--mono); }
+    .lesson-panel h2 { font: 500 29px/1.15 var(--serif); letter-spacing: -.035em; margin: 21px 0 8px; }
+    .lesson-desc { color: #667168; font-size: 12px; line-height: 1.75; margin: 0; }
+    .task-box { margin-top: auto; padding-top: 20px; }
+    .task-kicker { font-size: 10px; color: var(--rust); font-weight: 700; letter-spacing: .1em; }
+    .task-box p { margin: 7px 0 13px; font-size: 12px; line-height: 1.65; }
+    .evidence { border-top: 1px solid #e1dbcf; padding-top: 12px; display: flex; gap: 10px; color: #5d6c60; font-size: 11px; line-height: 1.5; }
+    .evidence-mark { flex: 0 0 18px; width: 18px; height: 18px; border-radius: 50%; color: var(--moss); border: 1px solid #aeb8aa; display: grid; place-items: center; font: 10px var(--mono); }
+    .route-section { margin-top: 25px; border: 1px solid var(--line); background: rgba(251,249,243,.83); border-radius: 9px; padding: 19px 22px 21px; }
+    .route-heading { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 17px; }
+    .route-heading h2 { margin: 0; font: 500 21px var(--serif); letter-spacing: -.02em; }
+    .route-total { color: var(--muted); font: 10px var(--mono); }
+    .route { display: grid; grid-template-columns: repeat(5, 1fr); list-style: none; margin: 0; padding: 0; }
+    .route-item { position: relative; min-height: 95px; padding: 14px 14px 5px 14px; border-top: 2px solid #d8d1c3; }
+    .route-item::before { content: ""; position: absolute; top: -6px; left: 14px; width: 9px; height: 9px; border-radius: 50%; background: #d8d1c3; border: 2px solid var(--card); }
+    .route-item.active { border-top-color: var(--rust); }
+    .route-item.active::before { background: var(--rust); box-shadow: 0 0 0 4px var(--rust-soft); }
+    .route-item.done { border-top-color: var(--moss); }
+    .route-item.done::before { background: var(--moss); }
+    .route-top { display: flex; justify-content: space-between; color: #8a8f84; font: 10px var(--mono); }
+    .route-item.active .route-top { color: var(--rust); }
+    .route-item h3 { font: 600 12px var(--sans); margin: 11px 0 6px; }
+    .route-item p { margin: 0; color: #879087; font-size: 10px; line-height: 1.45; }
+    .agenda-jump { color: var(--rust); font-size: 11px; font-weight: 650; text-decoration: none; border-bottom: 1px solid #d7a390; padding-bottom: 3px; }
+    .agenda-jump:hover { color: #9d3e28; }
+    .bottom-note { display: flex; justify-content: space-between; gap: 18px; color: #738076; margin-top: 17px; font-size: 10px; line-height: 1.6; }
+    .bottom-note strong { color: #52665a; font-weight: 600; }
+    .agenda-section { margin-top: 38px; scroll-margin-top: 20px; }
+    .agenda-intro { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 15px; }
+    .agenda-intro h2 { margin: 7px 0 5px; font: 500 29px/1.15 var(--serif); letter-spacing: -.035em; }
+    .agenda-intro p { max-width: 630px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+    .agenda-aside { flex: 0 0 auto; color: var(--moss); font: 10px var(--mono); letter-spacing: .04em; }
+    .agenda-card { margin: 10px 0; border: 1px solid var(--line); border-radius: 8px; background: var(--card); overflow: hidden; }
+    .agenda-card[open] { box-shadow: 0 8px 22px rgba(37,45,36,.045); }
+    .agenda-card summary { display: grid; grid-template-columns: 115px minmax(160px, 1fr) 100px 18px; align-items: center; gap: 16px; padding: 15px 19px; cursor: pointer; list-style: none; }
+    .agenda-card summary::-webkit-details-marker { display: none; }
+    .agenda-time { color: var(--rust); font: 11px var(--mono); letter-spacing: .015em; }
+    .agenda-title { font-weight: 650; font-size: 13px; }
+    .agenda-budget { color: var(--muted); font: 10px var(--mono); text-align: right; }
+    .agenda-toggle { color: var(--rust); font-size: 17px; line-height: 1; text-align: center; transition: transform .2s; }
+    .agenda-card[open] .agenda-toggle { transform: rotate(45deg); }
+    .agenda-body { display: grid; grid-template-columns: minmax(160px, .9fr) minmax(330px, 1.5fr) minmax(180px, .95fr); gap: 20px; padding: 0 19px 19px; border-top: 1px solid #e8e2d7; }
+    .agenda-column { padding-top: 16px; }
+    .agenda-column h4 { margin: 0 0 10px; color: #738076; font: 10px var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+    .agenda-column ul { margin: 0; padding-left: 16px; color: #44534a; font-size: 11px; line-height: 1.7; }
+    .agenda-column li + li { margin-top: 4px; }
+    .agenda-steps { list-style: none; margin: 0; padding: 0; }
+    .agenda-steps li { display: grid; grid-template-columns: 91px 1fr; gap: 11px; color: #44534a; font-size: 11px; line-height: 1.55; padding: 4px 0; }
+    .agenda-steps time { color: var(--rust); font: 10px var(--mono); white-space: nowrap; }
+    .agenda-proof { border-left: 2px solid #d8c9b9; padding-left: 13px; color: #526358; font-size: 11px; line-height: 1.7; }
+    .agenda-proof strong { display: block; margin-bottom: 6px; color: var(--ink); font-size: 11px; }
+    .outcomes { margin-top: 19px; padding: 20px 21px; background: #e3ded2; border-radius: 8px; }
+    .outcomes-head { display: flex; justify-content: space-between; align-items: baseline; gap: 15px; margin-bottom: 14px; }
+    .outcomes-head h2 { margin: 0; font: 500 23px var(--serif); letter-spacing: -.02em; }
+    .outcomes-head span { color: #68756b; font: 10px var(--mono); }
+    .outcome-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; }
+    .outcome-item { min-height: 80px; background: rgba(251,249,243,.7); border: 1px solid rgba(112,117,100,.16); border-radius: 5px; padding: 12px; }
+    .outcome-item span { display: block; margin-bottom: 6px; color: var(--rust); font: 10px var(--mono); }
+    .outcome-item strong { display: block; font-size: 11px; line-height: 1.55; }
+    .outcomes-note { margin: 13px 0 0; color: #6f796f; font-size: 10px; line-height: 1.6; }
+    .error-toast { position: fixed; right: 20px; bottom: 20px; max-width: 340px; padding: 13px 16px; background: #7f3323; color: white; box-shadow: var(--shadow); border-radius: 5px; font-size: 12px; opacity: 0; transform: translateY(8px); pointer-events: none; transition: .2s; }
+    .error-toast.show { opacity: 1; transform: translateY(0); }
+    @media (max-width: 850px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .timer-panel { min-height: 300px; }
+      .lesson-panel { min-height: 240px; }
+      .route { grid-template-columns: 1fr; }
+      .route-item { min-height: auto; padding: 9px 12px 13px 28px; border-top: 0; border-left: 2px solid #d8d1c3; }
+      .route-item::before { top: 11px; left: -6px; }
+      .route-item.active { border-left-color: var(--rust); }
+      .route-item.done { border-left-color: var(--moss); }
+      .route-top { display: inline-flex; gap: 14px; }
+      .route-item h3 { margin: 5px 0 3px; }
+      .route-item p { max-width: 520px; }
+      .agenda-body { grid-template-columns: 1fr 1.5fr; gap: 14px; }
+      .agenda-column:last-child { grid-column: 1 / -1; }
+      .outcome-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 520px) {
+      .shell { width: min(100% - 28px, 1180px); padding-top: 15px; }
+      .topbar { margin-bottom: 30px; }
+      .brand-mark { width: 36px; height: 36px; }
+      .local-chip { font-size: 9px; padding: 7px 9px; }
+      h1 { font-size: 38px; }
+      .timer-panel { min-height: 300px; padding: 21px 18px; }
+      .time { font-size: clamp(52px, 15vw, 72px); }
+      .time-row { gap: 8px; }
+      .time-unit { font-size: 8px; }
+      .save-note { display: none; }
+      .lesson-panel { padding: 19px; }
+      .route-section { padding: 17px 16px; }
+      .bottom-note { flex-direction: column; }
+      .route-heading { align-items: flex-start; flex-wrap: wrap; gap: 10px; }
+      .route-total { margin-left: auto; }
+      .agenda-intro { display: block; }
+      .agenda-aside { display: block; margin-top: 9px; }
+      .agenda-card summary { grid-template-columns: 1fr auto 16px; gap: 8px; padding: 13px 12px; }
+      .agenda-time { grid-column: 1; grid-row: 1; }
+      .agenda-title { grid-column: 1; grid-row: 2; }
+      .agenda-budget { grid-column: 2; grid-row: 1 / span 2; }
+      .agenda-toggle { grid-column: 3; grid-row: 1 / span 2; }
+      .agenda-body { grid-template-columns: 1fr; gap: 0; padding: 0 13px 15px; }
+      .agenda-column { padding-top: 13px; }
+      .agenda-column:last-child { grid-column: auto; }
+      .agenda-proof { padding-left: 10px; }
+      .outcomes { padding: 17px 14px; }
+      .outcomes-head { align-items: flex-start; flex-direction: column; gap: 6px; }
+      .outcome-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand" aria-label="5H Codex Bootcamp">
+        <div class="brand-mark">5H</div>
+        <div><div class="brand-name">Codex Bootcamp</div><div class="brand-sub">实战教练 · 第一版</div></div>
+      </div>
+      <div class="local-chip"><span class="local-dot"></span>本机计时 · 可暂停</div>
+    </header>
+
+    <section aria-labelledby="title">
+      <div class="eyebrow">从第一次提问，到独立交付</div>
+      <h1 id="title">把一个念头，<br>做成能运行的小作品。</h1>
+      <p class="intro">五小时主动学习额度，分几天完成也可以。你在 Codex 里亲自操作，教练帮你拆任务、看结果、找下一步。</p>
+    </section>
+
+    <section class="hero-grid" aria-label="课程计时和当前任务">
+      <article class="timer-panel">
+        <div class="timer-head">
+          <div class="timer-label">课程剩余时间 · 共 05 小时</div>
+          <div id="statusTag" class="status-tag" aria-live="polite">尚未开始</div>
+        </div>
+        <div class="time-row">
+          <div id="timeDisplay" class="time" aria-live="off">05:00:00</div>
+          <div class="time-unit">H&nbsp;&nbsp; M&nbsp;&nbsp; S</div>
+        </div>
+        <p id="timerCaption" class="timer-caption">点击开始后计时；暂停就冻结，回来后接着学。</p>
+        <div id="clockTrack" class="clock-track" aria-label="五小时进度">
+          <div class="clock-segment"><span></span></div><div class="clock-segment"><span></span></div><div class="clock-segment"><span></span></div><div class="clock-segment"><span></span></div><div class="clock-segment"><span></span></div>
+        </div>
+        <div class="timer-meta"><span>已用 <strong id="elapsedDisplay">00:00:00</strong></span><span>课前安装不计时</span></div>
+        <div class="timer-controls">
+          <button id="mainControl" class="primary-button" type="button"><span class="button-symbol">▶</span><span>开始训练</span></button>
+          <button id="resetButton" class="quiet-button" type="button">重新开始</button>
+          <span id="saveNote" class="save-note">进度保存在本机</span>
+        </div>
+      </article>
+
+      <article class="lesson-panel">
+        <div class="lesson-head"><div class="lesson-label">现在要做</div><div id="lessonIndex" class="lesson-index">LEVEL 01 / 05</div></div>
+        <h2 id="lessonTitle">第一次动手</h2>
+        <p id="lessonDescription" class="lesson-desc">认识当前工作区，只学完成第一个任务需要的操作。让 Codex 创建一页简单内容，再亲自打开看结果。</p>
+        <div class="task-box">
+          <div class="task-kicker">本关任务</div>
+          <p id="lessonTask">在专用训练目录里，做出一个能打开的简单页面。</p>
+          <div class="evidence"><span class="evidence-mark">✓</span><span id="lessonEvidence">过关要看：页面文件确实存在，打开后能看到内容。</span></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="route-section" aria-labelledby="routeTitle">
+      <div class="route-heading"><h2 id="routeTitle">五小时路线</h2><a class="agenda-jump" href="#agenda">看每一关具体怎么过 ↓</a><span class="route-total">300 MINUTES · 5 STAGES</span></div>
+      <ol class="route">
+        <li class="route-item active" data-level-id="01"><div class="route-top"><span>01 / 05</span><span>45 MIN</span></div><h3>第一次动手</h3><p>打开工作区，做出第一个结果</p></li>
+        <li class="route-item" data-level-id="02"><div class="route-top"><span>02 / 05</span><span>60 MIN</span></div><h3>把任务说清楚</h3><p>给背景、拆小任务、看改动</p></li>
+        <li class="route-item" data-level-id="03"><div class="route-top"><span>03 / 05</span><span>90 MIN</span></div><h3>做成小应用</h3><p>加功能、运行、处理一次报错</p></li>
+        <li class="route-item" data-level-id="04"><div class="route-top"><span>04 / 05</span><span>45 MIN</span></div><h3>留下可复用规则</h3><p>写下项目规则，再让它生效</p></li>
+        <li class="route-item" data-level-id="05"><div class="route-top"><span>05 / 05</span><span>60 MIN</span></div><h3>带回自己的工作</h3><p>独立做一个熟悉的小任务</p></li>
+      </ol>
+    </section>
+
+    <section class="agenda-section" id="agenda" aria-labelledby="agendaTitle">
+      <div class="agenda-intro">
+        <div>
+          <div class="eyebrow">一小时一小时拆开看</div>
+          <h2 id="agendaTitle">这五小时怎么度过</h2>
+          <p>每一关都有明确任务、练习时间和过关证据。计时只在学员开始后运行；休息或隔天继续时按暂停。</p>
+        </div>
+        <div class="agenda-aside">课前安装不计时 · 总计 300 分钟</div>
+      </div>
+
+      <details class="agenda-card" open>
+        <summary><span class="agenda-time">00:00–00:45</span><span class="agenda-title">第一关 · 第一次动手</span><span class="agenda-budget">45 分钟</span><span class="agenda-toggle">＋</span></summary>
+        <div class="agenda-body">
+          <div class="agenda-column"><h4>你会学会</h4><ul><li>找到 Codex 当前工作区和文件位置。</li><li>用一句目标和一个结果条件开始任务。</li><li>看 Codex 改了什么，再亲自打开结果。</li></ul></div>
+          <div class="agenda-column"><h4>按时间走</h4><ol class="agenda-steps"><li><time>00:00–00:08</time><span>打开专用训练目录，认出当前项目和文件。</span></li><li><time>00:08–00:18</time><span>说清想做的页面和“什么样算完成”。</span></li><li><time>00:18–00:30</time><span>让 Codex 建页面，学员查看新增文件。</span></li><li><time>00:30–00:38</time><span>在浏览器打开页面，确认结果真实可见。</span></li><li><time>00:38–00:45</time><span>要求一个小修改，重新打开并指出改动。</span></li></ol></div>
+          <div class="agenda-column"><h4>产物与过关</h4><div class="agenda-proof"><strong>带走一个能打开的简单页面</strong>页面文件确实存在；学员能找到它、打开它，并说出改动发生在哪里。</div></div>
+        </div>
+      </details>
+
+      <details class="agenda-card" open>
+        <summary><span class="agenda-time">00:45–01:45</span><span class="agenda-title">第二关 · 把任务说清楚</span><span class="agenda-budget">60 分钟</span><span class="agenda-toggle">＋</span></summary>
+        <div class="agenda-body">
+          <div class="agenda-column"><h4>你会学会</h4><ul><li>把目标、背景、限制和通过条件说完整。</li><li>把“大而全”切成一次能检查的小改动。</li><li>先看计划和差异，不满意时及时纠正。</li></ul></div>
+          <div class="agenda-column"><h4>按时间走</h4><ol class="agenda-steps"><li><time>00:45–00:58</time><span>补齐一个模糊需求里的目标、背景和限制。</span></li><li><time>00:58–01:12</time><span>把待办清单拆成小功能，并选一个先做。</span></li><li><time>01:12–01:25</time><span>让 Codex 复述计划；学员修正范围和遗漏。</span></li><li><time>01:25–01:37</time><span>实现“输入并新增一条任务”。</span></li><li><time>01:37–01:45</time><span>查看改动，逐项对照开始时的通过条件。</span></li></ol></div>
+          <div class="agenda-column"><h4>产物与过关</h4><div class="agenda-proof"><strong>一份小任务说明 + 新增任务功能</strong>功能符合任务说明；学员能说出给了 Codex 哪些背景、限制和检查方法。</div></div>
+        </div>
+      </details>
+
+      <details class="agenda-card" open>
+        <summary><span class="agenda-time">01:45–03:15</span><span class="agenda-title">第三关 · 做成一个小应用</span><span class="agenda-budget">90 分钟</span><span class="agenda-toggle">＋</span></summary>
+        <div class="agenda-body">
+          <div class="agenda-column"><h4>你会学会</h4><ul><li>先定最小可用范围，再逐步加功能。</li><li>一次改一项，改完就运行和检查。</li><li>从报错和实际行为找线索，再让 Codex 修复。</li></ul></div>
+          <div class="agenda-column"><h4>按时间走</h4><ol class="agenda-steps"><li><time>01:45–02:00</time><span>定下待办清单还要完成的功能和边界。</span></li><li><time>02:00–02:20</time><span>加上标记完成和删除任务。</span></li><li><time>02:20–02:35</time><span>让刷新后的列表保留状态。</span></li><li><time>02:35–02:50</time><span>亲自试新增、完成、删除和刷新四种情况。</span></li><li><time>02:50–03:05</time><span>在可恢复的练习样例里处理一次小问题。</span></li><li><time>03:05–03:15</time><span>复跑关键操作，查看最终改动并复盘。</span></li></ol></div>
+          <div class="agenda-column"><h4>产物与过关</h4><div class="agenda-proof"><strong>一个能用的待办清单网页</strong>新增、完成、删除、刷新保留都能展示；学员能说清一次问题如何被发现和修好。</div></div>
+        </div>
+      </details>
+
+      <details class="agenda-card" open>
+        <summary><span class="agenda-time">03:15–04:00</span><span class="agenda-title">第四关 · 留下可复用规则</span><span class="agenda-budget">45 分钟</span><span class="agenda-toggle">＋</span></summary>
+        <div class="agenda-body">
+          <div class="agenda-column"><h4>你会学会</h4><ul><li>用 AGENTS.md 留下当前项目每次都要遵守的规则。</li><li>知道 Skill、MCP、Git 分别解决哪类问题。</li><li>用 Git 状态和差异看清改动范围。</li></ul></div>
+          <div class="agenda-column"><h4>按时间走</h4><ol class="agenda-steps"><li><time>03:15–03:25</time><span>看一个短规则文件，挑出适合长期保留的要求。</span></li><li><time>03:25–03:40</time><span>写三条项目规则，再做一项小修改验证。</span></li><li><time>03:40–03:48</time><span>看一个 Skill 模板，认识如何保存重复流程。</span></li><li><time>03:48–03:55</time><span>查看 Git 状态和差异，理解改动与保存点。</span></li><li><time>03:55–04:00</time><span>用自己的话区分规则、Skill、MCP。</span></li></ol></div>
+          <div class="agenda-column"><h4>产物与过关</h4><div class="agenda-proof"><strong>一份实际生效的 AGENTS.md</strong>Codex 后续修改遵守其中规则。认识 Skill、MCP、Git；本关不要求部署 MCP 或掌握所有 Git 命令。</div></div>
+        </div>
+      </details>
+
+      <details class="agenda-card" open>
+        <summary><span class="agenda-time">04:00–05:00</span><span class="agenda-title">第五关 · 带回自己的工作</span><span class="agenda-budget">60 分钟</span><span class="agenda-toggle">＋</span></summary>
+        <div class="agenda-body">
+          <div class="agenda-column"><h4>你会学会</h4><ul><li>把熟悉的小任务变成清楚、可检查的结果。</li><li>自己拆解任务，让 Codex 按步骤执行。</li><li>亲自检查并解释方法怎样迁移到下一次工作。</li></ul></div>
+          <div class="agenda-column"><h4>按时间走</h4><ol class="agenda-steps"><li><time>04:00–04:10</time><span>选一个低风险小任务，不拷入机密文件。</span></li><li><time>04:10–04:22</time><span>写目标、背景、限制和通过条件。</span></li><li><time>04:22–04:37</time><span>学员主导 Codex 做出一个小版本。</span></li><li><time>04:37–04:50</time><span>运行或检查，提供证据并修正偏差。</span></li><li><time>04:50–05:00</time><span>说明结果、验证方法和下一次的做法。</span></li></ol></div>
+          <div class="agenda-column"><h4>产物与过关</h4><div class="agenda-proof"><strong>一项迁移挑战成果 + 学员复盘</strong>结果真实存在，学员能解释检查步骤。挑战关由学员完成，教练只按需提示。</div></div>
+        </div>
+      </details>
+
+      <section class="outcomes" aria-labelledby="outcomesTitle">
+        <div class="outcomes-head"><h2 id="outcomesTitle">五小时后，你会带走什么</h2><span>课程设计目标 · 不是五小时精通 Codex</span></div>
+        <div class="outcome-grid">
+          <div class="outcome-item"><span>01 / 能运行</span><strong>一个能新增、完成、删除任务的待办清单网页</strong></div>
+          <div class="outcome-item"><span>02 / 会指挥</span><strong>一份下次还能用的小任务说明模板</strong></div>
+          <div class="outcome-item"><span>03 / 可复用</span><strong>一份经过实际修改验证的 AGENTS.md</strong></div>
+          <div class="outcome-item"><span>04 / 能迁移</span><strong>一个自己选题完成的工作小任务和复盘</strong></div>
+        </div>
+        <p class="outcomes-note">真正的通过依据是文件、运行结果和学员自己的解释。页面里的关卡目前用于展示课程设计；自动验收尚未接入。</p>
+      </section>
+    </section>
+
+    <footer class="bottom-note">
+      <span><strong>这五小时怎么算：</strong>只累计开始到暂停之间的课程时间；日历时间不计入。</span>
+      <span>样机 · 暂无账号、云同步或 DeepTutor 连接</span>
+    </footer>
+  </main>
+  <div id="errorToast" class="error-toast" role="alert"></div>
+
+  <script>
+    const mainControl = document.getElementById('mainControl');
+    const resetButton = document.getElementById('resetButton');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const elapsedDisplay = document.getElementById('elapsedDisplay');
+    const statusTag = document.getElementById('statusTag');
+    const timerCaption = document.getElementById('timerCaption');
+    const clockTrack = document.getElementById('clockTrack');
+    const errorToast = document.getElementById('errorToast');
+    const lessonIndex = document.getElementById('lessonIndex');
+    const lessonTitle = document.getElementById('lessonTitle');
+    const lessonDescription = document.getElementById('lessonDescription');
+    const lessonTask = document.getElementById('lessonTask');
+    const lessonEvidence = document.getElementById('lessonEvidence');
+    const routeItems = document.querySelectorAll('.route-item[data-level-id]');
+    const lessonCards = {
+      "01": {
+        title: "第一次动手",
+        description: "认识当前工作区，只学完成第一个任务需要的操作。让 Codex 创建一页简单内容，再亲自打开看结果。",
+        task: "在专用训练目录里，做出一个能打开的简单页面。",
+        evidence: "过关要看：页面文件确实存在，打开后能看到内容。"
+      },
+      "02": {
+        title: "把任务说清楚",
+        description: "把目标、背景、限制和通过条件说完整，再让 Codex 只做一项小功能。",
+        task: "给待办清单加上新增任务，并检查每项要求。",
+        evidence: "过关要看：功能符合要求，学员能说出自己提供了哪些关键信息。"
+      },
+      "03": {
+        title: "做成一个小应用",
+        description: "继续做待办清单，逐项增加完成、删除和刷新保留，再亲自运行和排错。",
+        task: "让待办清单完成主要操作，并修复一个安全练习样例中的小问题。",
+        evidence: "过关要看：新增、完成、删除、刷新后保留均可演示。"
+      },
+      "04": {
+        title: "留下可复用规则",
+        description: "把适合长期保留的项目要求写下来，再确认 Codex 会遵守它。",
+        task: "为待办项目写三条 AGENTS.md 规则，并用一次小修改验证。",
+        evidence: "过关要看：后续修改遵守规则；能说清 AGENTS.md、Skill、MCP 的区别。"
+      },
+      "05": {
+        title: "带回自己的工作",
+        description: "由学员自己选一项低风险的小任务，教练逐渐退到旁边。",
+        task: "自己拆解一个熟悉任务，让 Codex 完成小版本，并亲自检查。",
+        evidence: "过关要看：成果真实存在；学员能讲清检查过程和迁移方法。"
+      }
+    };
+    let state = null;
+    let baseRemaining = 5 * 60 * 60;
+    let baseElapsed = 0;
+    let baseAt = Date.now();
+    let toastTimer;
+
+    function duration(total) {
+      const value = Math.max(0, Math.floor(total));
+      const hours = Math.floor(value / 3600);
+      const minutes = Math.floor((value % 3600) / 60);
+      const seconds = value % 60;
+      return [hours, minutes, seconds].map((n) => String(n).padStart(2, '0')).join(':');
+    }
+
+    function showError(message) {
+      errorToast.textContent = message;
+      errorToast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => errorToast.classList.remove('show'), 3500);
+    }
+
+    function applySnapshot(next) {
+      state = next;
+      baseRemaining = Number(next.remaining_seconds ?? next.allowance_seconds ?? 18000);
+      baseElapsed = Number(next.elapsed_seconds ?? next.used_seconds ?? 0);
+      baseAt = Date.now();
+      render();
+    }
+
+    function render() {
+      const drift = state?.running ? Math.floor((Date.now() - baseAt) / 1000) : 0;
+      const remaining = Math.max(0, baseRemaining - drift);
+      const elapsed = Math.min(state?.allowance_seconds ?? 18000, baseElapsed + drift);
+      const allowance = state?.allowance_seconds ?? 18000;
+      const usedFraction = allowance ? elapsed / allowance : 0;
+      timeDisplay.textContent = duration(remaining);
+      elapsedDisplay.textContent = duration(elapsed);
+      const fills = clockTrack.querySelectorAll('.clock-segment span');
+      fills.forEach((fill, index) => {
+        fill.style.width = `${Math.max(0, Math.min(1, usedFraction * 5 - index)) * 100}%`;
+      });
+
+      const completed = Array.isArray(state?.completed_level_ids) ? state.completed_level_ids : [];
+      const levelId = state?.current_level_id || "01";
+      const finished = state?.course_status === 'complete' || levelId === 'done';
+      routeItems.forEach((item) => {
+        const id = item.dataset.levelId;
+        item.classList.toggle('done', completed.includes(id));
+        item.classList.toggle('active', !finished && id === levelId);
+        if (!finished && id === levelId) item.setAttribute('aria-current', 'step');
+        else item.removeAttribute('aria-current');
+      });
+      if (finished) {
+        lessonIndex.textContent = '已完成 · 05 / 05';
+        lessonTitle.textContent = '五小时目标已完成';
+        lessonDescription.textContent = '五关成果已保存。现在可以查看学习报告和还想继续练习的地方。';
+        lessonTask.textContent = '回顾待办清单、项目规则和迁移挑战。';
+        lessonEvidence.textContent = '结课报告应列出已完成的成果和学员自己的复盘。';
+      } else if (lessonCards[levelId]) {
+        lessonIndex.textContent = `LEVEL ${levelId} / 05`;
+        lessonTitle.textContent = lessonCards[levelId].title;
+        lessonDescription.textContent = lessonCards[levelId].description;
+        lessonTask.textContent = lessonCards[levelId].task;
+        lessonEvidence.textContent = lessonCards[levelId].evidence;
+      }
+
+      statusTag.classList.remove('running', 'expired');
+      if (state?.course_status === 'complete') {
+        statusTag.textContent = '课程已完成';
+        statusTag.classList.add('running');
+        timerCaption.textContent = '五关已完成，作品和学习记录都已保留。';
+        mainControl.innerHTML = '<span class="button-symbol">✓</span><span>课程已完成</span>';
+        mainControl.disabled = true;
+      } else if (remaining <= 0 || state?.course_status === 'time_used') {
+        statusTag.textContent = '五小时已用完';
+        statusTag.classList.add('expired');
+        timerCaption.textContent = '课程时间已用完。已保存的作品和进度仍然保留。';
+        mainControl.innerHTML = '<span class="button-symbol">✓</span><span>课程已结束</span>';
+        mainControl.disabled = true;
+      } else if (state?.running) {
+        statusTag.textContent = '正在学习';
+        statusTag.classList.add('running');
+        timerCaption.textContent = '计时中。需要休息时暂停，回来后继续。';
+        mainControl.innerHTML = '<span class="button-symbol">Ⅱ</span><span>暂停计时</span>';
+        mainControl.disabled = false;
+      } else if (state?.course_status === 'paused') {
+        statusTag.textContent = '已暂停';
+        timerCaption.textContent = '时间已冻结；下次继续会从这里开始。';
+        mainControl.innerHTML = '<span class="button-symbol">▶</span><span>继续训练</span>';
+        mainControl.disabled = false;
+      } else {
+        statusTag.textContent = '尚未开始';
+        timerCaption.textContent = '点击开始后计时；暂停就冻结，回来后接着学。';
+        mainControl.innerHTML = '<span class="button-symbol">▶</span><span>开始训练</span>';
+        mainControl.disabled = false;
+      }
+    }
+
+    async function syncState() {
+      try {
+        const response = await fetch('/api/state', { cache: 'no-store' });
+        if (!response.ok) throw new Error('读取本地进度失败');
+        applySnapshot(await response.json());
+      } catch (error) {
+        showError('无法连接本地计时器。请确认本地预览仍在运行。');
+      }
+    }
+
+    async function perform(action) {
+      mainControl.disabled = true;
+      try {
+        const response = await fetch('/api/action', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action })
+        });
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.error || '计时操作没有完成');
+        applySnapshot(payload);
+      } catch (error) {
+        showError(error.message);
+        await syncState();
+      }
+    }
+
+    mainControl.addEventListener('click', () => {
+      const action = state?.running ? 'pause' : (state?.course_status === 'paused' ? 'resume' : 'start');
+      perform(action);
+    });
+
+    resetButton.addEventListener('click', async () => {
+      const confirmed = window.confirm('重新开始会清零本机保存的五小时计时和关卡记录。确定继续吗？');
+      if (confirmed) await perform('reset');
+    });
+
+    window.addEventListener('pagehide', () => {
+      if (state?.running) {
+        const payload = new Blob([JSON.stringify({ action: 'pause' })], { type: 'application/json' });
+        navigator.sendBeacon('/api/action', payload);
+      }
+    });
+
+    syncState();
+    setInterval(render, 250);
+    setInterval(syncState, 5000);
+  </script>
+</body>
+</html>

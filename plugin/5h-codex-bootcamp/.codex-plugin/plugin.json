@@ -1,0 +1,6 @@
+{
+  "name": "5h-codex-bootcamp",
+  "version": "0.1.0",
+  "description": "A five-hour hands-on Codex coach with a pauseable local course timer.",
+  "skills": "./skills/"
+}

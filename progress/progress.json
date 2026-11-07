@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "course_id": "5h-codex-bootcamp",
+  "course_title": "5H CODEX BOOTCAMP",
+  "allowance_seconds": 18000,
+  "used_seconds": 0,
+  "running": false,
+  "running_since": null,
+  "course_status": "not_started",
+  "current_level_id": "01",
+  "completed_level_ids": [],
+  "weak_points": [],
+  "updated_at": "2026-11-04T15:00:58+00:00"
+}

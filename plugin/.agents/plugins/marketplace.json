@@ -1,0 +1,20 @@
+{
+  "name": "5h-bootcamp-local",
+  "interface": {
+    "displayName": "5H Codex Bootcamp Preview"
+  },
+  "plugins": [
+    {
+      "name": "5h-codex-bootcamp",
+      "source": {
+        "source": "local",
+        "path": "./5h-codex-bootcamp"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
